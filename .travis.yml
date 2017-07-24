@@ -1,4 +1,6 @@
 language: elixir
-
+matrix:
+  include:
+  - elixir: 1.4
 script:
   - mix test

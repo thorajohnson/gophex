@@ -3,6 +3,7 @@ defmodule GophexTest do
   doctest Gophex
 
   test "Main process is spawned" do
+    Gophex.start("", "")
     assert is_pid(Process.whereis(:main))
   end
 end

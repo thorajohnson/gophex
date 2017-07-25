@@ -1,18 +1,13 @@
 defmodule Gophex do
-  @moduledoc """
-  Documentation for Gophex.
-  """
+  use Application
+  require Logger
 
-  @doc """
-  Hello world.
+  def start(_type, _args) do
+    main_proccess = spawn(fn () -> main({:init, "files"}) end)
+    |> Process.register(:main)
+  end
 
-  ## Examples
-
-      iex> Gophex.hello
-      :world
-
-  """
-  def hello do
-    :world
+  defp main({:init, "files"}) do
+    
   end
 end

@@ -1,8 +1,8 @@
 defmodule GophexTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Gophex
 
-  test "the truth" do
-    assert 1 + 1 == 2
+  test "Main process is spawned" do
+    assert is_pid(Process.whereis(:main))
   end
 end

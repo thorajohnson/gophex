@@ -6,4 +6,9 @@ defmodule GophexTest do
     Gophex.start("", "")
     assert is_pid(Process.whereis(:main))
   end
+
+  test "Supervisor is spawned when server is started" do
+    Gophex.start("", "")
+    assert is_pid(Process.whereis(Gophex.TaskSupervisor))
+  end
 end

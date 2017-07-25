@@ -11,4 +11,9 @@ defmodule GophexTest do
     Gophex.start("", "")
     assert is_pid(Process.whereis(Gophex.Supervisor))
   end
+
+  test "accept() is spawned by supervisor" do
+    Gophex.start("", "")
+    assert is_pid(Process.whereis(:accept))
+  end
 end

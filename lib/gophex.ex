@@ -6,7 +6,8 @@ defmodule Gophex do
     import Supervisor.Spec
 
     children = [
-      supervisor(Task.Supervisor, [[name: Gophex.TaskSupervisor]])
+      supervisor(Task.Supervisor, [[name: Gophex.TaskSupervisor]]),
+      worker(Task, [Gophex, :accept, [4040]])
     ]
 
     opts = [strategy: :one_for_one, name: Gophex.Supervisor]
@@ -19,5 +20,16 @@ defmodule Gophex do
 
   defp main({:init, "files"}) do
     
+  end
+
+  def accept(port) do
+    {:ok, socket} = :gen_tcp.listen(port,
+      [:binary, packet: 0, active: false])
+    Logger.info "Accepting connections on port #{port}"
+    loop_accept(socket)
+  end
+
+  defp loop_accept(socket) do
+    {:ok, client} = :gen_tcp.accept(socket)
   end
 end

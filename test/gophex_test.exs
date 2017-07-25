@@ -12,8 +12,10 @@ defmodule GophexTest do
     assert is_pid(Process.whereis(Gophex.Supervisor))
   end
 
-  test "accept() is spawned by supervisor" do
-    Gophex.start("", "")
-    assert is_pid(Process.whereis(:accept))
+  test "can establish a TCP connection with Gophex" do
+    # Gophex.start("", "")
+    spawn fn -> Gophex.accept(4040) end
+    assert {:ok, socket} = :gen_tcp.connect({127, 0, 0, 1}, 4040, [:binary, packet: 0, active: :once])
+    :ok = :gen_tcp.close(socket)
   end
 end

@@ -6,7 +6,7 @@ defmodule Gophex.Agent do
   end
 
   defp main({:init, menu}) do
-    IO.inspect parse_menu(:init, menu)
+    parse_menu(:init, menu)
     #parsed_menu = parse_menu(:init, menu)
     #main(parsed_menu)
   end
@@ -15,7 +15,10 @@ defmodule Gophex.Agent do
     Agent.get(file_list, &extract_file_list(&1))
   end
 
-      
+  def get_menu(file_list, :all) do
+    Agent.get(file_list, fn (files) -> files end)
+  end
+    
 
   #defp main(state) do
   #  receive do

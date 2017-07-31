@@ -28,6 +28,6 @@ defmodule Gophex.GophexTest do
     Gophex.Agent.start_link({})
     file_list = Gophex.Agent.get_menu(:main, :all)    
     assert is_list(file_list)
-    assert length(file_list) > Gophex.Agent.get_menu(:main, :menu)
+    assert length(file_list) > length(Gophex.Agent.get_menu(:main, :menu))
   end
 end

@@ -6,7 +6,7 @@ defmodule Gophex.Agent do
   end
 
   defp main({:init, menu}) do
-    parse_menu(:init, menu)
+    IO.inspect parse_menu(:init, menu)
     #parsed_menu = parse_menu(:init, menu)
     #main(parsed_menu)
   end

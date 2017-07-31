@@ -23,4 +23,11 @@ defmodule Gophex.GophexTest do
     main_pid = Process.whereis(:main)
     assert is_list(Gophex.Agent.get_menu(:main, :menu))
   end
+
+  test "All command sends all files currently on Gopher server" do
+    Gophex.Agent.start_link({})
+    file_list = Gophex.Agent.get_menu(:main, :all)    
+    assert is_list(file_list)
+    assert length(file_list) > Gophex.Agent.get_menu(:main, :menu)
+  end
 end

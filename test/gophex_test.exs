@@ -6,13 +6,6 @@ defmodule Gophex.GophexTest do
  #   %{gophex: gophex}
  # end
 
-  test "Main process is spawned"  do
-    Gophex.Worker.spawn_main(:main_process)
-    main_pid = Process.whereis(:main_process)
-    assert is_pid(main_pid)
-    Process.exit(main_pid, :kill)
-  end
-
   test "Supervisor is spawned when server is started" do
     supervisor_pid = Gophex.Supervisor.start("", "")
     assert is_pid(Process.whereis(Gophex.Supervisor))
@@ -20,23 +13,14 @@ defmodule Gophex.GophexTest do
 
   test "can establish a TCP connection with Gophex" do
     worker_pid = spawn fn -> Gophex.Worker.accept(4040) end
-    assert {:ok, socket} = :gen_tcp.connect({127, 0, 0, 1}, 4040, [:binary, packet: 0, active: :once])
+    assert {:ok, socket} = :gen_tcp.connect({127, 0, 0, 1}, 4040, [:binary, packet: 0, active: :once, reuseaddr: true])
     :ok = :gen_tcp.close(socket)
     Process.exit(worker_pid, :kill)
   end
 
   test "Sending empty string brings back file list on server" do
-    Gophex.Worker.spawn_main(:test_main)
-    main_pid = Process.whereis(:test_main)
-    send :test_main, {:menu, self()}
-    receive do
-      files_list ->
-	assert is_list(files_list)
-	Process.exit(main_pid, :kill)
-    after
-      1_000 ->
-	assert false
-	Process.exit(main_pid, :kill)
-    end
+    Gophex.Agent.start_link({})
+    main_pid = Process.whereis(:main)
+    assert is_list(Gophex.Agent.get_menu(:main, :menu))
   end
 end

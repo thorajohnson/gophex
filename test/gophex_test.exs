@@ -1,11 +1,6 @@
 defmodule Gophex.GophexTest do
   use ExUnit.Case, async: false
   
-  #setup do
-  #  {:ok, gophex} = start_supervised(%{id: Gophex.Worker, start: {Gophex.Worker, :init, [4040]}})
- #   %{gophex: gophex}
- # end
-
   test "Supervisor is spawned when server is started" do
     supervisor_pid = Gophex.Supervisor.start("", "")
     assert is_pid(Process.whereis(Gophex.Supervisor))
@@ -20,14 +15,13 @@ defmodule Gophex.GophexTest do
 
   test "Sending empty string brings back file list on server" do
     Gophex.Agent.start_link({})
-    main_pid = Process.whereis(:main)
-    assert is_list(Gophex.Agent.get_menu(:main, :menu))
+    assert is_list(Gophex.Agent.get(:main, :menu))
   end
 
   test "All command sends all files currently on Gopher server" do
     Gophex.Agent.start_link({})
-    file_list = Gophex.Agent.get_menu(:main, :all)    
+    file_list = Gophex.Agent.get(:main, :all)    
     assert is_list(file_list)
-    assert length(file_list) > length(Gophex.Agent.get_menu(:main, :menu))
+    assert length(file_list) > length(Gophex.Agent.get(:main, :menu))
   end
 end

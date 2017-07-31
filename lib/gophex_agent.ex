@@ -7,27 +7,16 @@ defmodule Gophex.Agent do
 
   defp main({:init, menu}) do
     parse_menu(:init, menu)
-    #parsed_menu = parse_menu(:init, menu)
-    #main(parsed_menu)
   end
 
-  def get_menu(file_list, :menu) do
+  def get(file_list, :menu) do
     Agent.get(file_list, &extract_file_list(&1))
   end
 
-  def get_menu(file_list, :all) do
+  def get(file_list, :all) do
     Agent.get(file_list, fn (files) -> files end)
   end
-    
-
-  #defp main(state) do
-  #  receive do
-  #    {:menu, pid} ->
-  #	files_list = extract_file_list(state)
-  #	send pid, files_list
-  #  end
-  #end
-
+   
   defp parse_menu(:init, menu) do
     {:ok, file_list} = File.ls(menu)
     parse_menu(menu, file_list)
@@ -58,7 +47,7 @@ defmodule Gophex.Agent do
 	    [parsed_file] ++ parse_menu(menu, tail)
 	end
     end
-    end
+  end
 
     def parse_file(menu, file) do
     path = menu <> "/" <> file

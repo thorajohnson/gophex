@@ -8,7 +8,7 @@ defmodule Gophex.GophexTest do
 
   test "can establish a TCP connection with Gophex" do
     worker_pid = spawn fn -> Gophex.Worker.accept(4040) end
-    assert {:ok, socket} = :gen_tcp.connect({0, 0, 0, 0}, 4040, [:binary, packet: 0, active: :once, reuseaddr: true])
+    assert {:ok, socket} = :gen_tcp.connect('0.0.0.0', 4040, [:binary, packet: 0, active: false, reuseaddr: true])
     :ok = :gen_tcp.close(socket)
     Process.exit(worker_pid, :kill)
   end

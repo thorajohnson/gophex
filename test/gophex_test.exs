@@ -27,8 +27,10 @@ defmodule Gophex.GophexTest do
 
   test "Get command sends requested file" do
     Gophex.Agent.start_link({})
-    file_list = Gophex.Agent.get(:main, :get, "gopher_facts.txt")
-    assert Map.has_key?(file_list, :__struct__)
-    assert file_list.data == File.stat(file_list.path)
+    file = Gophex.Agent.get(:main, :get, "gopher_facts.txt")
+    assert Map.has_key?(file, :__struct__)
+    
+    {:ok, file_stat} = File.stat(file.path) 
+    assert file.data == file_stat
   end
 end

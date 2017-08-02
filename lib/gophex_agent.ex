@@ -20,6 +20,17 @@ defmodule Gophex.Agent do
   def get(file_list, :all) do
     Agent.get(file_list, fn (files) -> files end)
   end
+
+  def get(file_list, :get, file_name) do
+    Agent.get(file_list, fn (files) ->
+      case  Map.fetch(files, file_name) do
+	{:ok, file} ->
+	  file
+	:error ->
+	  :error
+      end
+    end)
+  end
    
   defp parse_menu(:init, menu), do: parse_menu(:init, menu, %{})
 
@@ -59,7 +70,7 @@ defmodule Gophex.Agent do
     path = menu <> "/" <> file
     case File.stat(path) do
       {:ok, data} ->
-	Map.put(parsed_list, file, %FileList{path: menu, data: data})
+	Map.put(parsed_list, file, %FileList{path: path, data: data})
       error ->
 	{:error, error}
     end

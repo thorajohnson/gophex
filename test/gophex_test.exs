@@ -33,4 +33,12 @@ defmodule Gophex.GophexTest do
     {:ok, file_stat} = File.stat(file.path) 
     assert file.data == file_stat
   end
+
+  test "GetDir command sends requested directory" do
+    Gophex.Agent.start_link()
+    dir = Gophex.Agent.get(:main, :getdir, "test_dir")
+    assert is_list(dir)
+    {:ok, dir_contents} = File.ls("files/test_dir")
+    assert length(dir) == length(dir_contents) 
+  end
 end

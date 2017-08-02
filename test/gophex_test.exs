@@ -38,6 +38,7 @@ defmodule Gophex.GophexTest do
     Gophex.Agent.start_link()
     dir = Gophex.Agent.get(:main, :getdir, "test_dir")
     assert is_list(dir)
+
     {:ok, dir_contents} = File.ls("files/test_dir")
     assert length(dir) == length(dir_contents) 
   end

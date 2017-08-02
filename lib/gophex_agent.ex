@@ -21,6 +21,10 @@ defmodule Gophex.Agent do
     Agent.get(file_list, &fetch_file(&1, file_name))
   end
 
+  def get(file_list, :getdir, dir_name) do
+    Agent.get(file_list, &fetch_dir(&1, dir_name))
+  end
+  
   defp fetch_file(files, file_name) do
     case  Map.fetch(files, file_name) do
 	{:ok, file} ->
@@ -28,6 +32,13 @@ defmodule Gophex.Agent do
 	:error ->
 	  :error
       end
+  end
+
+  defp fetch_dir(files, dir_name) do
+    dir_path = dir_name <> "/"
+    Enum.filter(files, fn({_, file}) ->
+      String.contains?(file.path, dir_path) 
+    end)
   end
    
   defp parse_menu(:init, menu), do: parse_menu(:init, menu, %{})

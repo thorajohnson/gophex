@@ -1,6 +1,10 @@
 defmodule Gophex.Agent do
   use Agent
 
+  defmodule FileList do
+    defstruct path: "", data: %File.Stat{}
+  end
+  
   def start_link(_opts) do
         Agent.start_link(fn -> main({:init, "files"}) end, name: :main)
   end
@@ -17,43 +21,45 @@ defmodule Gophex.Agent do
     Agent.get(file_list, fn (files) -> files end)
   end
    
-  defp parse_menu(:init, menu) do
+  defp parse_menu(:init, menu), do: parse_menu(:init, menu, %{})
+
+  defp parse_menu(:init, menu, parsed_list) do
     {:ok, file_list} = File.ls(menu)
-    parse_menu(menu, file_list)
+    parse_menu(menu, file_list, parsed_list)
   end
 
-  defp parse_menu(menu, file_list) do
+  defp parse_menu(menu, file_list, parsed_list) do
     case file_list do
       [] ->
-	[]
+	parsed_list
       [ head ] ->
-	parsed_file = parse_file(menu, head)
-	case parsed_file do
-	  {file_name, {_, %File.Stat{type: :directory}}} ->
-	    [parsed_file] ++ parse_menu(:init, menu <> "/" <> file_name)
+	parsed_list = parse_file(menu, head, parsed_list)
+	case Map.fetch!(parsed_list, head)  do
+	  %FileList{data: %File.Stat{type: :directory}} ->
+	    parse_menu(:init, menu <> "/" <> head, parsed_list)
 	    
-	  {_, {_, %File.Stat{type: :regular}}} ->
-	    [parsed_file]
+	  %FileList{data: %File.Stat{type: :regular}} ->
+	    parsed_list
 	end
 	
-      [ head | tail ] ->
-	parsed_file = parse_file(menu, head)
-	case parsed_file do
-	  {file_name, {_, %File.Stat{type: :directory}}} ->
-	    [parsed_file] ++ parse_menu(:init, menu <> "/" <> file_name) ++
-	      parse_menu(menu, tail)
+	[ head | tail ] ->
+	parsed_list = parse_file(menu, head, parsed_list)
+	case Map.fetch!(parsed_list, head) do
+	  %FileList{data: %File.Stat{type: :directory}} ->
+	    parse_menu(:init, menu <> "/" <> head, parsed_list)
+	    |>  (&parse_menu(menu, tail, &1)).()
 
-	  {_, {_, %File.Stat{type: :regular}}} ->
-	    [parsed_file] ++ parse_menu(menu, tail)
+	  %FileList{data:  %File.Stat{type: :regular}} ->
+	    parse_menu(menu, tail, parsed_list)
 	end
     end
   end
 
-    def parse_file(menu, file) do
+  def parse_file(menu, file, parsed_list) do
     path = menu <> "/" <> file
     case File.stat(path) do
       {:ok, data} ->
-	{file, {menu, data}}
+	Map.put(parsed_list, file, %FileList{path: menu, data: data})
       error ->
 	{:error, error}
     end
@@ -62,12 +68,7 @@ defmodule Gophex.Agent do
   def extract_file_list(directory_list) do
     directory_list
     |> Enum.filter(fn(file_info) ->
-      case file_info do
-	{_, {"files", _}} ->
-	  true
-	_Other ->
-	  false
-      end
+      match?({:path, "files"}, file_info)
     end)
   end
 end

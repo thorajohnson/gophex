@@ -21,7 +21,7 @@ defmodule Gophex.GophexTest do
   test "All command sends all files currently on Gopher server" do
     Gophex.Agent.start_link({})
     file_list = Gophex.Agent.get(:main, :all)    
-    assert is_list(file_list)
-    assert length(file_list) > length(Gophex.Agent.get(:main, :menu))
+    assert is_map(file_list)
+    assert map_size(file_list) > length(Gophex.Agent.get(:main, :menu))
   end
 end

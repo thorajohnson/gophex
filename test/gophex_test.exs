@@ -24,4 +24,11 @@ defmodule Gophex.GophexTest do
     assert is_map(file_list)
     assert map_size(file_list) > length(Gophex.Agent.get(:main, :menu))
   end
+
+  test "Get command sends requested file" do
+    Gophex.Agent.start_link({})
+    file_list = Gophex.Agent.get(:main, :get, "gopher_facts.txt")
+    assert Map.has_key?(file_list, :__struct__)
+    assert file_list.data == File.stat(file_list.path)
+  end
 end

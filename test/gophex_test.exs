@@ -13,5 +13,13 @@ defmodule Gophex.GophexTest do
     Process.exit(worker_pid, :kill)
   end
 
-  
+  test "connecting to server sends back top-level file menu" do
+    worker_pid = spawn fn -> Gophex.Worker.accept(4040) end
+      {:ok, socket} = :gen_tcp.connect('0.0.0.0', 4040, [:binary, packet: 0, active: false])
+      menu_string = (:gen_tcp.send(socket, ""))
+      assert is_binary(menu_string)
+      assert String.contains?(menu_string, File.ls("files"))
+      :ok = :gen_tcp.close(socket)
+      Process.exit(worker_pid, :kill)
+  end
 end

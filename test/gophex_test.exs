@@ -6,20 +6,16 @@ defmodule Gophex.GophexTest do
     assert is_pid(Process.whereis(Gophex.Supervisor))
   end
 
-  test "can establish a TCP connection with Gophex" do
-    worker_pid = spawn fn -> Gophex.Worker.accept(4040) end
-    assert {:ok, socket} = :gen_tcp.connect('0.0.0.0', 4040, [:binary, packet: 0, active: false, reuseaddr: true])
+  test "connecting to server sends back top-level file menu" do
+    Gophex.Agent.start_link()
+    worker_pid = spawn_link(fn -> Gophex.Worker.accept(4040) end)
+    assert {:ok, socket} = :gen_tcp.connect('0.0.0.0', 4040, [:binary, packet: 0, active: :false, reuseaddr: true])
+    :gen_tcp.send(socket, "\r\n")
+    {:ok, menu} = :gen_tcp.recv(socket, 0)
+    assert is_binary(menu)
+    {:ok, menu_files} = File.ls("files")
+    assert String.contains?(menu, menu_files)
     :ok = :gen_tcp.close(socket)
     Process.exit(worker_pid, :kill)
-  end
-
-  test "connecting to server sends back top-level file menu" do
-    worker_pid = spawn fn -> Gophex.Worker.accept(4040) end
-      {:ok, socket} = :gen_tcp.connect('0.0.0.0', 4040, [:binary, packet: 0, active: false])
-      menu_string = (:gen_tcp.send(socket, ""))
-      assert is_binary(menu_string)
-      assert String.contains?(menu_string, File.ls("files"))
-      :ok = :gen_tcp.close(socket)
-      Process.exit(worker_pid, :kill)
   end
 end

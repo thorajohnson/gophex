@@ -12,11 +12,17 @@ defmodule Gophex.GophexAgentTest do
   #  assert is_list(Gophex.Agent.get(:main, :menu))
   #end
 
-  test "Agent stores all files currently on server" do
+  test "Agent contains the files one level within files directory" do
     Gophex.Agent.start_link()
-    file_list = Gophex.Agent.get(:main, :all)
-    assert map_size(file_list) == File.ls("files")
-  end
+    file_map = Gophex.Agent.get(:main, :all)
+    assert File.ls!("files") |> Enum.all?(&Map.has_key?(file_map, &1)) 
+  end  
+  
+  #test "Agent stores all files currently on server" do
+  #  Gophex.Agent.start_link()
+  #  file_list = Gophex.Agent.get(:main, :all)
+  #  assert map_size(file_list) == length(Path.wildcard("files/**"))
+  #end
 
 #  test "All command sends all files currently on Gopher server" do
 #    Gophex.Agent.start_link()

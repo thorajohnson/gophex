@@ -6,7 +6,7 @@ defmodule Gophex.Agent do
   end
   
   def start_link() do
-        Agent.start_link(fn -> [] end, name: :main)
+        Agent.start_link(fn -> create_file_list("files") end, name: :main)
   end
 
   def get(file_list, :menu) do
@@ -40,7 +40,12 @@ defmodule Gophex.Agent do
       String.contains?(file.path, dir_path) 
     end)
   end
-   
+
+  defp create_file_list(dir) do
+    File.ls!("files")
+    |> Enum.with_index(1)
+    |> Enum.into(%{})
+  end
 
   def get_server_menu(directory_list) do
     Enum.filter(directory_list, fn({_, file_info}) ->

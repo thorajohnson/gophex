@@ -43,7 +43,7 @@ defmodule Gophex.Agent do
 
   defp create_file_list(dir) do
     File.ls!("files")
-    |> Enum.with_index(1)
+    |> Enum.map(fn(file) -> {file, Path.join("files", file)} end) 
     |> Enum.into(%{})
   end
 

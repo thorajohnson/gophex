@@ -31,11 +31,11 @@ defmodule Gophex.GophexAgentTest do
     assert file_map["gopher.txt"].type == :regular
   end
   
-  #test "Agent stores all files currently on server" do
-  #  Gophex.Agent.start_link()
-  #  file_list = Gophex.Agent.get(:main, :all)
-  #  assert map_size(file_list) == length(Path.wildcard("files/**"))
-  #end
+  test "Agent stores all files currently on server" do
+    Gophex.Agent.start_link()
+    file_list = Gophex.Agent.get(:main, :all)
+    assert map_size(file_list) == length(Path.wildcard("files/**"))
+  end
 
 #  test "All command sends all files currently on Gopher server" do
 #    Gophex.Agent.start_link()

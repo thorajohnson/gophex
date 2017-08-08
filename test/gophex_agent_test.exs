@@ -31,18 +31,20 @@ defmodule Gophex.GophexAgentTest do
     assert file_map["gopher.txt"].type == :regular
   end
   
-  test "Agent stores all files currently on server" do
-    Gophex.Agent.start_link()
-    file_list = Gophex.Agent.get(:main, :all)
-    assert map_size(file_list) == length(Path.wildcard("files/**"))
+  test "Agent stores all files currently on server", %{agent: agent} do
+    server_files = Gophex.Agent.get(agent, :all)
+    file_list = Path.wildcard("files/**")
+    |> Enum.map(fn (path) -> String.split(path, "/") |> List.last end)
+    assert map_size(server_files) == length(file_list)
+    assert file_list |> Enum.all?(&Map.has_key?(server_files, &1))
   end
 
-#  test "All command sends all files currently on Gopher server" do
-#    Gophex.Agent.start_link()
-#    file_list = Gophex.Agent.get(:main, :all)    
-#    assert is_map(file_list)
-#    assert map_size(file_list) > length(Gophex.Agent.get(:main, :menu))
-#  end
+  test "All command sends all files currently on Gopher server", %{agent: agent} do
+    file_map = Gophex.Agent.get(agent, :all)    
+    assert is_map(file_map)
+    assert map_size(file_map) > length(File.ls!("files"))
+    #assert map_size(file_map) > length(Gophex.Agent.get(agent, :menu))
+  end
 
 #  test "Get command sends requested file" do
 #    Gophex.Agent.start_link()

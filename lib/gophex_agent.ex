@@ -4,6 +4,8 @@ defmodule Gophex.Agent do
   defmodule FileData do
     defstruct path: "", data: %File.Stat{}
   end
+
+  def start_link(_opts), do: start_link()
   
   def start_link() do
         Agent.start_link(fn -> create_file_list("files") end, name: :main)
@@ -49,8 +51,6 @@ defmodule Gophex.Agent do
 
   def get_server_menu(directory_list) do
     Enum.filter(directory_list, fn({_, file_info}) ->
-      #IO.inspect file_info
-      #match?({:path, "files"}, file_info)
     if count_slashes(String.codepoints(file_info.path), 0) > 1 do
       false
     else

@@ -45,8 +45,12 @@ defmodule Gophex.Agent do
 
   defp create_file_list(dir) do
     File.ls!("files")
-    |> Enum.map(fn(file) ->
-      path = Path.join("files", file)
+    |> Enum.map(&create_file_entry(&1)) 
+    |> Enum.into(%{})
+  end
+
+  defp create_file_entry(file) do
+    path = Path.join("files", file)
       cond do
 	File.regular? path -> 
 	  {file, %FileData{path: path, type: :regular}}
@@ -55,11 +59,7 @@ defmodule Gophex.Agent do
 	true ->
 	  {file, %FileData{path: path, type: :other}}  
       end
-    end) 
-    |> Enum.into(%{})
-  end
-
-      
+  end      
 
   def get_server_menu(directory_list) do
     Enum.filter(directory_list, fn({_, file_info}) ->

@@ -2,7 +2,7 @@ defmodule Gophex.Agent do
   use Agent
 
   defmodule FileData do
-    defstruct path: "", data: %File.Stat{}
+    defstruct path: "", type: :other
   end
 
   def start_link(_opts), do: start_link()
@@ -45,9 +45,21 @@ defmodule Gophex.Agent do
 
   defp create_file_list(dir) do
     File.ls!("files")
-    |> Enum.map(fn(file) -> {file, Path.join("files", file)} end) 
+    |> Enum.map(fn(file) ->
+      path = Path.join("files", file)
+      cond do
+	File.regular? path -> 
+	  {file, %FileData{path: path, type: :regular}}
+	File.dir? path ->
+	  {file, %FileData{path: path, type: :directory}}
+	true ->
+	  {file, %FileData{path: path, type: :other}}  
+      end
+    end) 
     |> Enum.into(%{})
   end
+
+      
 
   def get_server_menu(directory_list) do
     Enum.filter(directory_list, fn({_, file_info}) ->

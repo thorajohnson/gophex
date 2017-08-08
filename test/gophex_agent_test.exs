@@ -21,9 +21,14 @@ defmodule Gophex.GophexAgentTest do
     assert File.ls!("files") |> Enum.all?(&Map.has_key?(file_map, &1)) 
   end
 
-  test "Agent stores the file path for directories", %{agent: agent} do
+  test "Agent stores the file path for files and directories", %{agent: agent} do
     file_map = Gophex.Agent.get(agent, :all)
-    assert file_map["gopher_facts"] == "files/gopher_facts"
+    assert file_map["gopher_facts"].path == "files/gopher_facts"
+  end
+
+  test "Agent stores whether a file is a directory or a file", %{agent: agent} do
+    file_map = Gophex.Agent.get(agent, :all)
+    assert file_map["gopher.txt"].type == :regular
   end
   
   #test "Agent stores all files currently on server" do

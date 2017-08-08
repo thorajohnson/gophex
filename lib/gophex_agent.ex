@@ -45,17 +45,29 @@ defmodule Gophex.Agent do
 
   defp create_file_list(dir) do
     File.ls!("files")
-    |> Enum.map(&create_file_entry(&1)) 
+ #|> Enum.map(&create_file_entry(&1))
+    |> create_file_list("files")
+    |> List.flatten()
     |> Enum.into(%{})
   end
 
-  defp create_file_entry(file) do
-    path = Path.join("files", file)
+  defp create_file_list(file_list, dir) do
+    case file_list do
+      [head] ->
+	[create_file_entry(head, dir)]
+      [head|tail] ->
+	[create_file_entry(head, dir)] ++ create_file_list(tail, dir) 
+    end
+  end 
+
+  defp create_file_entry(file, dir) do
+    path = Path.join(dir, file)
       cond do
 	File.regular? path -> 
 	  {file, %FileData{path: path, type: :regular}}
-	File.dir? path ->
-	  {file, %FileData{path: path, type: :directory}}
+        File.dir? path ->
+          create_file_list(File.ls!(path), path) ++	
+	  [{file, %FileData{path: path, type: :directory}}]
 	true ->
 	  {file, %FileData{path: path, type: :other}}  
       end

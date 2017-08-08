@@ -6,7 +6,6 @@ defmodule Gophex.Agent do
   end
 
   def start_link(_opts), do: start_link()
-  
   def start_link() do
         Agent.start_link(fn -> create_file_list("files") end, name: :main)
   end
@@ -45,7 +44,6 @@ defmodule Gophex.Agent do
 
   defp create_file_list(dir) do
     File.ls!("files")
- #|> Enum.map(&create_file_entry(&1))
     |> create_file_list("files")
     |> List.flatten()
     |> Enum.into(%{})

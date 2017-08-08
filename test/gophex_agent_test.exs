@@ -11,10 +11,14 @@ defmodule Gophex.GophexAgentTest do
     assert is_pid(main_pid)
   end
 
-  #test "Sending empty string brings back file list on server" do
-  #  Gophex.Agent.start_link()
-  #  assert is_list(Gophex.Agent.get(:main, :menu))
-  #end
+  test "Sending empty string brings back file list on server", %{agent: agent} do
+    menu = Gophex.Agent.get(agent, :menu)
+    file_list = File.ls!("files")
+    assert is_list(file_list)
+    assert Enum.all?(menu, fn ({menu_file, _}) -> 
+      Enum.any?(file_list, fn (file) -> menu_file == file end)
+    end)
+  end
 
   test "Agent contains the files one level within files directory", %{agent: agent} do
     file_map = Gophex.Agent.get(agent, :all)
@@ -42,25 +46,22 @@ defmodule Gophex.GophexAgentTest do
   test "All command sends all files currently on Gopher server", %{agent: agent} do
     file_map = Gophex.Agent.get(agent, :all)    
     assert is_map(file_map)
-    assert map_size(file_map) > length(File.ls!("files"))
-    #assert map_size(file_map) > length(Gophex.Agent.get(agent, :menu))
+    assert map_size(file_map) > length(Gophex.Agent.get(agent, :menu))
   end
 
-#  test "Get command sends requested file" do
-#    Gophex.Agent.start_link()
-#    file = Gophex.Agent.get(:main, :get, "gopher_facts.txt")
-#    assert Map.has_key?(file, :__struct__)
-#    
-#    {:ok, file_stat} = File.stat(file.path) 
-#    assert file.data == file_stat
-#  end
+  test "Get command sends requested file", %{agent: agent} do
+    file = Gophex.Agent.get(agent, :get, "gopher_facts.txt")
+    assert Map.has_key?(file, :__struct__)
+    {:ok, file_stat} = File.stat(file.path)
+    assert file.type == file_stat.type
+  end
 
-#  test "GetDir command sends contents of requested directory" do
-#    Gophex.Agent.start_link()
-#    dir = Gophex.Agent.get(:main, :getdir, "test_dir")
-#    assert is_list(dir)
-#
-#    {:ok, dir_contents} = File.ls("files/test_dir")
-#    assert length(dir) == length(dir_contents) 
-#  end
+  test "GetDir command sends contents of requested directory", %{agent: agent} do
+    dir = Gophex.Agent.get(:main, :getdir, "test_dir")
+    assert is_list(dir)
+
+    IO.inspect dir
+    {:ok, dir_contents} = File.ls("files/test_dir")
+    assert length(dir) == length(dir_contents) 
+  end
 end

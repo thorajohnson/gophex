@@ -69,7 +69,7 @@ defmodule Gophex.Worker do
   end
 
   defp file_to_string({file_name, file}) do
-    case file.data.type do
+    case file.type do
       :directory ->
 	"1" <> file_name <> "\t" <> file.path <> "\tlocalhost\t7000\r\n"
 

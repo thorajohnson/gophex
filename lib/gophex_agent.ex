@@ -4,7 +4,7 @@ defmodule Gophex.Agent do
   defmodule FileData do
     defstruct path: "", type: :other
   end
-
+  
   def start_link(_opts), do: start_link()
   def start_link() do
         Agent.start_link(fn -> create_file_list("files") end, name: :main)

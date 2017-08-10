@@ -12,6 +12,9 @@ defmodule Gophex.Application do
     children = [
       # Starts a worker by calling: Gophex.Worker.start_link(arg1, arg2, arg3)
       # worker(Gophex.Worker, [arg1, arg2, arg3]),
+      supervisor(Task.Supervisor, [[name: Gophex.TaskSupervisor]]),
+      worker(Task, [Gophex.Worker, :accept, [4040]]),
+      worker(Agent, [Gophex.Agent, :start_link, [:opts]])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

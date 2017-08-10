@@ -15,10 +15,10 @@ defmodule Gophex.GophexTest do
     assert is_binary(menu)
     {:ok, menu_files} = File.ls("files")
     assert String.first(menu) == "0" 
-   # assert String.contains?(menu, menu_files)
-    #:gen_tcp.send(socket, "gopher.txt")
-    # {:ok, file} = :gen_tcp.recv(socket, 0)
-    #assert file == "Welcome to Gopher!" 
+    assert String.contains?(menu, menu_files)
+    :gen_tcp.send(socket, "gopher.txt")
+    {:ok, file} = :gen_tcp.recv(socket, 0)
+    assert file == "Welcome to Gopher!" 
     #:ok = :gen_tcp.close(socket)
     #Process.exit(worker_pid, :kill)
   end

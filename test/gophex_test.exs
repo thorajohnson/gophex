@@ -23,7 +23,7 @@ defmodule Gophex.GophexTest do
 
     :gen_tcp.send(socket, "\r\ntest_dir\r\n")
     {:ok, dir} = :gen_tcp.recv(socket, 0)
-    {:ok, test_dir} = File.ls("test_dir")
+    {:ok, test_dir} = File.ls("files/test_dir")
     assert String.first(dir) == "0"
     assert String.contains?(dir, test_dir)
     assert String.contains?(dir, "localhost")

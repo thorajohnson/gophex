@@ -41,6 +41,8 @@ defmodule Gophex.Worker do
   defp send_file_or_dir(path) do
     if Regex.match?(~r/\.[^.]+/, path) do
       send_file(path)
+    else
+      send_dir(path)
     end
   end
 
@@ -52,6 +54,10 @@ defmodule Gophex.Worker do
     end
   end
 
+  defp send_dir(dir) do
+    dir = Gophex.Agent.get(:main, :getdir, dir)
+    |> menu_to_string()
+  end
 
   defp menu_to_string(file_list) do
     case file_list do

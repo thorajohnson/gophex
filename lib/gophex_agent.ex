@@ -73,28 +73,12 @@ defmodule Gophex.Agent do
 
   def get_server_menu(directory_list) do
     Enum.filter(directory_list, fn({_, file_info}) ->
-    if count_slashes(String.codepoints(file_info.path), 0) > 1 do
-      false
-    else
-      true
-    end
+      file_info.path
+      |> String.codepoints()
+      |> Enum.count(fn (char) -> char == "/" end)
+      |> only_one_slash?()
     end)
   end
 
-  defp count_slashes(char_list, count) do
-    case char_list do
-      [ head ] ->
-	if head == "/" do
-	  count + 1
-	else
-	  count
-	end
-      [ head | tail ] ->
-	if head == "/" do
-	  count_slashes(tail, count + 1)
-	else 
-	  count_slashes(tail, count)
-	end
-    end
-  end
+  defp only_one_slash?(count), do: count == 1
 end

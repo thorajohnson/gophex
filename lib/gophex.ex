@@ -1,10 +1,10 @@
 defmodule Gophex.Worker do
-  #use Application
   require Logger
+
+  @tcp_options [:binary, packet: 0, active: false, reuseaddr: true]
   
   def accept(port) do
-    {:ok, socket} = :gen_tcp.listen(port,
-      [:binary, packet: 0, active: false, reuseaddr: true])
+    {:ok, socket} = :gen_tcp.listen(port, @tcp_options)
     Logger.info "Accepting connections on port #{port}"
     loop_accept(socket)
   end
@@ -12,27 +12,25 @@ defmodule Gophex.Worker do
   defp loop_accept(loop_socket) do
     {:ok, client} = :gen_tcp.accept(loop_socket)
     {:ok, pid} = Task.Supervisor.start_child(Gophex.TaskSupervisor,
-      fn -> loop(client) end)
+      fn -> serve(client) end)
     :ok = :gen_tcp.controlling_process(client, pid)
-    #:gen_tcp.controlling_process(client, spawn fn () -> loop(client) end)
     loop_accept(loop_socket)
   end
 
-  defp loop(socket) do
-    #:inet.setopts(socket, active: :once)
-    case :gen_tcp.recv(socket, 0) do
-      {:ok, data} ->
-	case to_charlist(data) do
-	  [13, 10] ->
-	    :gen_tcp.send(socket, send_server_menu())
-	  file ->
-	    cleaned_file = file |> to_string |> String.trim
-	    :gen_tcp.send(socket, send_file_or_dir(cleaned_file))
-	end
-	loop(socket)
+  defp serve(socket) do
+    with {:ok, data} <- :gen_tcp.recv(socket, 0),
+      do: send_response(socket, data)	
+  end
 
-      {:error, :closed} -> IO.puts("connection closed")	
+  defp send_response(socket, data) do
+    case to_charlist(data) do
+      [13, 10] ->
+	:gen_tcp.send(socket, send_server_menu())
+      file ->
+	cleaned_file = file |> to_string |> String.trim
+	:gen_tcp.send(socket, send_file_or_dir(cleaned_file))
     end
+    serve(socket)
   end
 
   defp send_server_menu() do

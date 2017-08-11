@@ -2,7 +2,6 @@ defmodule Gophex.GophexTest do
   use ExUnit.Case, async: false
   
   test "Supervisor is spawned when server is started" do
-    supervisor_pid = Gophex.Supervisor.start("", "")
     assert is_pid(Process.whereis(Gophex.Supervisor))
   end
 
@@ -16,9 +15,9 @@ defmodule Gophex.GophexTest do
     {:ok, menu_files} = File.ls("files")
     assert String.first(menu) == "0" 
     assert String.contains?(menu, menu_files)
-    :gen_tcp.send(socket, "gopher.txt")
+    :gen_tcp.send(socket, "gopher.txt\r\n")
     {:ok, file} = :gen_tcp.recv(socket, 0)
-    assert file == "Welcome to Gopher!" 
+    assert String.trim(file) == "Welcome to Gopher!" 
     #:ok = :gen_tcp.close(socket)
     #Process.exit(worker_pid, :kill)
   end

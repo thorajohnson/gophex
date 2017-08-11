@@ -28,10 +28,8 @@ defmodule Gophex.Agent do
   
   defp fetch_file(files, file_name) do
     case  Map.fetch(files, file_name) do
-	{:ok, file} ->
-	  file
-	:error ->
-	  :error
+	{:ok, file} -> file
+	:error -> :error
       end
   end
 
@@ -60,15 +58,15 @@ defmodule Gophex.Agent do
 
   defp create_file_entry(file, dir) do
     path = Path.join(dir, file)
-      cond do
-	File.regular? path -> 
-	  {file, %FileData{path: path, type: :regular}}
-        File.dir? path ->
-          create_file_list(File.ls!(path), path) ++	
+    cond do
+      File.regular? path -> 
+	{file, %FileData{path: path, type: :regular}}
+      File.dir? path ->
+	create_file_list(File.ls!(path), path) ++	
 	  [{file, %FileData{path: path, type: :directory}}]
-	true ->
-	  {file, %FileData{path: path, type: :other}}  
-      end
+      true ->
+	{file, %FileData{path: path, type: :other}}  
+    end
   end      
 
   def get_server_menu(directory_list) do

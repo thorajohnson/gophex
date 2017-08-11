@@ -34,10 +34,31 @@ defmodule Gophex.Worker do
   end
 
   defp send_server_menu() do
-    menu = Gophex.Agent.get(:main, :menu)
-    |> menu_to_string()
+    Gophex.Agent.get(:main, :menu)
+    |> dir_to_string()
   end
 
+
+  defp dir_to_string(file_list) do
+    case file_list do
+      [ head ] ->
+	file_to_string(head) 
+
+      [ head | tail ] ->
+	file_to_string(head) <> dir_to_string(tail)
+    end
+  end
+
+  defp file_to_string({file_name, file}) do
+    case file.type do
+      :directory ->
+	"1" <> file_name <> "\t" <> file.path <> "\tlocalhost\t7000\r\n"
+
+      :regular ->
+	"0" <> file_name <> "\t" <> file.path <> "\t localhost\t7000\r\n"
+    end
+  end
+  
   defp send_file_or_dir(path) do
     if Regex.match?(~r/\.[^.]+/, path) do
       send_file(path)
@@ -55,27 +76,7 @@ defmodule Gophex.Worker do
   end
 
   defp send_dir(dir) do
-    dir = Gophex.Agent.get(:main, :getdir, dir)
-    |> menu_to_string()
-  end
-
-  defp menu_to_string(file_list) do
-    case file_list do
-      [ head ] ->
-	file_to_string(head) 
-
-      [ head | tail ] ->
-	file_to_string(head) <> menu_to_string(tail)
-    end
-  end
-
-  defp file_to_string({file_name, file}) do
-    case file.type do
-      :directory ->
-	"1" <> file_name <> "\t" <> file.path <> "\tlocalhost\t7000\r\n"
-
-      :regular ->
-	"0" <> file_name <> "\t" <> file.path <> "\t localhost\t7000\r\n"
-    end
+    Gophex.Agent.get(:main, :getdir, dir)
+    |> dir_to_string()
   end
 end

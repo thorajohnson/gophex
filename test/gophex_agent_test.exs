@@ -1,11 +1,6 @@
 defmodule Gophex.GophexAgentTest do
   use ExUnit.Case, async: false
 
-  #setup do
-  #  {:ok, agent} = start_supervised(Gophex.Agent)
-  #  %{agent: agent}
-  #end
-
   test "Agent process is spawned"  do
     main_pid = Process.whereis(:main)
     assert is_pid(main_pid)
